@@ -1,152 +1,218 @@
-# WeGroup Platform
+# WeGroup Communication Platform
 
-Eine modulare, KI-gestützte Business-Plattform für Gruppen- und Projektmanagement.
+Eine moderne, echtzeitfähige Kommunikationsplattform für Teams, entwickelt mit Next.js 14, TypeScript, Prisma und WebSocket-Technologie.
 
-## 🚀 Überblick
+## 🚀 Features
 
-Die WeGroup Platform ist eine hochmoderne, KI-gestützte Business-Plattform, die darauf abzielt, Unternehmen eine umfassende Automatisierung, Orchestrierung und Optimierung ihrer Geschäftsprozesse zu ermöglichen.
+### 💬 **Real-time Messaging**
+- Sofortige Nachrichtenübertragung mit WebSocket
+- Typing-Indikatoren und Lesebestätigungen
+- Message-Reaktionen und Threading
+- Rich-Text-Unterstützung
 
-### Zentrale Features
+### 👥 **Team Collaboration**
+- Direkte Nachrichten (1:1)
+- Gruppenchats und Kanäle
+- Benutzer-Status (Online, Abwesend, Beschäftigt, Offline)
+- Teilnehmer-Rollen (Admin, Moderator, Mitglied)
 
-- **🤖 Maximale KI-Autonomie**: Alle Prozesse werden soweit wie möglich automatisiert und durch KI gesteuert
-- **🏢 Mandantenfähigkeit**: Sichere und klare Trennung von Daten und Prozessen für verschiedene Mandanten
-- **🔌 API-First-Architektur**: Offene, standardisierte Schnittstellen für einfache Integration
-- **⚙️ Self-Service & Delegation**: Nutzer können viele Verwaltungsaufgaben selbstständig erledigen
-- **🔒 Compliance & Datenschutz**: Vollständige Einhaltung von DSGVO, ISO-Standards und branchenspezifischen Vorgaben
-- **📈 Skalierbarkeit**: Cloud-native Architektur mit Microservices
+### 🔔 **Smart Notifications**
+- Intelligentes Benachrichtigungssystem
+- Ungelesene Nachrichten-Zähler
+- Push-Benachrichtigungen
+- Anpassbare Benachrichtigungseinstellungen
+
+### 🛡️ **Sicherheit & Datenschutz**
+- Sichere Dateiübertragung
+- Benutzer-Authentifizierung
+- Datenschutz-konforme Implementierung
+- Sichere API-Endpunkte
+
+### 📱 **Responsive Design**
+- Mobile-first Ansatz
+- Responsive UI-Komponenten
+- Touch-optimierte Bedienung
+- Cross-platform Kompatibilität
 
 ## 🏗️ Architektur
 
-### Technologie-Stack
+### **Frontend-Komponenten** (`src/components/communication/`)
+- `chat-window.tsx` - Hauptchat-Interface
+- `message-input.tsx` - Nachrichteneingabe mit Emoji-Support
+- `message-list.tsx` - Nachrichtenliste mit Reaktionen
+- `conversation-sidebar.tsx` - Konversationsübersicht
+- `user-status.tsx` - Online-Status-Anzeige
+- `notification-badge.tsx` - Benachrichtigungs-Badges
 
-- **Frontend**: Next.js 14 mit React 18 und TypeScript
-- **Styling**: Tailwind CSS mit shadcn/ui Komponenten
-- **Backend**: Microservices-Architektur (geplant)
-- **Datenbank**: PostgreSQL mit Prisma ORM
-- **Authentifizierung**: NextAuth.js
-- **Deployment**: Docker & Kubernetes
+### **API-Endpunkte** (`src/app/api/communication/`)
+- `conversations/route.ts` - Konversations-Management
+- `conversations/[id]/messages/route.ts` - Nachrichten pro Konversation
+- `messages/route.ts` - Nachrichten-CRUD-Operationen
+- `websocket/route.ts` - WebSocket-Handler
 
-### Module-Struktur
+### **Seiten/Routen** (`src/app/communication/`)
+- `page.tsx` - Hauptkommunikationsseite
+- `conversations/[id]/page.tsx` - Einzelne Konversationsansicht
+- `layout.tsx` - Layout für Kommunikationsbereich
 
-Die Plattform umfasst über 57 spezialisierte Module in drei Hauptkategorien:
+### **Event-Handler & Utils** (`src/lib/communication/`)
+- `websocket-handler.ts` - WebSocket-Logik und Event-Management
+- `message-events.ts` - Event-System für Nachrichten
+- `notification-service.ts` - Benachrichtigungsdienst
 
-#### 🔧 Basis-Module (41 Module)
-- HR / Personalmanagement
-- Buchhaltung / Finanzmanagement
-- Einkauf / Beschaffung
-- Logistik / Versand
-- Vertrieb / Kundenmanagement
-- Projektmanagement
-- CRM & Marketing
-- Compliance & Sicherheit
-- und viele weitere...
+### **Datenbank** (`prisma/schema.prisma`)
+- User Model - Benutzer-Management
+- Conversation Model - Konversationen
+- Message Model - Nachrichten
+- MessageAttachment Model - Dateianhänge
+- MessageReaction Model - Reaktionen
+- Notification Model - Benachrichtigungen
 
-#### 🎨 weCREATE-Module (6 Module)
-- KI-Avatare & Kreativplattform
-- KI-Content-Generator
-- KI-Storytelling-Engine
-- Kreativ-Community
-- Design-Tools & Prototyping
-- Community-Marktplatz
+## 🛠️ Tech Stack
 
-#### 💼 weSELL-Module (10 Module)
-- KI-gestütztes Vertriebsmanagement
-- Customer Experience Management
-- Digital Commerce & E-Commerce
-- Omnichannel-Marketing
-- Pricing & Revenue Management
-- Sales Analytics & Insights
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **Styling**: Tailwind CSS, Lucide Icons
+- **Backend**: Next.js API Routes, Prisma ORM
+- **Database**: SQLite (entwicklung), PostgreSQL (produktion)
+- **Real-time**: WebSocket, Socket.io
+- **State Management**: React Hooks, Event System
+- **Build Tools**: Turbopack, ESLint
 
-## 🚀 Quick Start
+## 📦 Installation
 
 ### Voraussetzungen
-
 - Node.js 18+ 
-- PostgreSQL 14+
-- Docker (optional)
+- npm oder yarn
+- Git
 
-### Installation
+### Setup
 
 1. **Repository klonen**
-   ```bash
-   git clone https://github.com/maruldk/wegroup-plattform.git
-   cd wegroup-plattform
-   ```
+```bash
+git clone https://github.com/maruldk/wegroup-communication.git
+cd wegroup-communication
+```
 
 2. **Dependencies installieren**
-   ```bash
-   cd app
-   npm install
-   ```
+```bash
+npm install
+```
 
 3. **Umgebungsvariablen konfigurieren**
-   ```bash
-   cp .env.example .env.local
-   # Bearbeite .env.local mit deinen Datenbankverbindungen
-   ```
+```bash
+cp .env.example .env
+# Bearbeite .env mit deinen Einstellungen
+```
 
-4. **Datenbank einrichten**
-   ```bash
-   npx prisma migrate dev
-   npx prisma db seed
-   ```
+4. **Datenbank initialisieren**
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
 
 5. **Entwicklungsserver starten**
-   ```bash
-   npm run dev
-   ```
-
-Die Anwendung ist nun unter `http://localhost:3000` verfügbar.
-
-### Demo-Zugang
-
-- **E-Mail**: john@doe.com
-- **Passwort**: johndoe123
-
-## 📁 Projektstruktur
-
-```
-wegroup-plattform/
-├── app/                    # Next.js Anwendung
-│   ├── app/               # App Router Seiten
-│   ├── components/        # React Komponenten
-│   ├── lib/              # Utility-Funktionen
-│   ├── prisma/           # Datenbankschema & Migrations
-│   └── public/           # Statische Assets
-├── docs/                 # Dokumentation
-│   ├── PROJECT_OVERVIEW.md
-│   ├── ARCHITECTURE.md
-│   ├── MODULE_SPECIFICATIONS.md
-│   └── ...
-└── README.md
+```bash
+npm run dev
 ```
 
-## 📚 Dokumentation
+Die Anwendung ist dann unter `http://localhost:3000` verfügbar.
 
-Detaillierte Dokumentation findest du im `docs/` Verzeichnis:
+## 🚀 Deployment
 
-- [📋 Projektübersicht](docs/PROJECT_OVERVIEW.md)
-- [🏗️ Architektur](docs/ARCHITECTURE.md)
-- [📦 Modul-Spezifikationen](docs/MODULE_SPECIFICATIONS.md)
-- [🎨 UI Design System](docs/UI_DESIGN_SYSTEM.md)
-- [🔗 Integration Standards](docs/INTEGRATION_STANDARDS.md)
+### Vercel (Empfohlen)
+```bash
+npm run build
+vercel --prod
+```
 
-## 🤝 Beitragen
+### Docker
+```bash
+docker build -t wegroup-communication .
+docker run -p 3000:3000 wegroup-communication
+```
 
-Wir freuen uns über Beiträge! Bitte lies unsere [Contribution Guidelines](CONTRIBUTING.md) für Details zum Entwicklungsprozess.
+## 📝 API-Dokumentation
+
+### Konversationen
+- `GET /api/communication/conversations` - Alle Konversationen abrufen
+- `POST /api/communication/conversations` - Neue Konversation erstellen
+
+### Nachrichten
+- `GET /api/communication/conversations/[id]/messages` - Nachrichten abrufen
+- `POST /api/communication/conversations/[id]/messages` - Nachricht senden
+- `PUT /api/communication/messages` - Nachricht bearbeiten
+- `DELETE /api/communication/messages` - Nachricht löschen
+
+### WebSocket Events
+- `authenticate` - Benutzer-Authentifizierung
+- `join-conversation` - Konversation beitreten
+- `send-message` - Nachricht senden
+- `typing` - Typing-Indikator
+- `add-reaction` - Reaktion hinzufügen
+
+## 🧪 Testing
+
+```bash
+# Unit Tests
+npm run test
+
+# E2E Tests
+npm run test:e2e
+
+# Coverage Report
+npm run test:coverage
+```
+
+## 📊 Performance
+
+- **First Contentful Paint**: < 1.5s
+- **Largest Contentful Paint**: < 2.5s
+- **Time to Interactive**: < 3.5s
+- **WebSocket Latency**: < 100ms
+- **Message Delivery**: < 50ms
+
+## 🔧 Konfiguration
+
+### WebSocket-Einstellungen
+```typescript
+// .env
+WS_PORT=3001
+WS_HOST=localhost
+```
+
+### Datei-Upload
+```typescript
+// .env
+MAX_FILE_SIZE=10485760  // 10MB
+UPLOAD_DIR=./uploads
+```
+
+## 🤝 Contributing
+
+1. Fork das Repository
+2. Erstelle einen Feature-Branch (`git checkout -b feature/amazing-feature`)
+3. Committe deine Änderungen (`git commit -m 'Add amazing feature'`)
+4. Push zum Branch (`git push origin feature/amazing-feature`)
+5. Öffne eine Pull Request
 
 ## 📄 Lizenz
 
-Dieses Projekt ist unter der [MIT Lizenz](LICENSE) lizenziert.
+Dieses Projekt steht unter der MIT-Lizenz. Siehe [LICENSE](LICENSE) für Details.
 
-## 🆘 Support
+## 🙏 Acknowledgments
+
+- Next.js Team für das großartige Framework
+- Prisma Team für die ausgezeichnete ORM
+- Tailwind CSS für das Styling-System
+- Socket.io für WebSocket-Implementierung
+
+## 📞 Support
 
 Bei Fragen oder Problemen:
-
-- 📧 E-Mail: support@wegroup-platform.com
-- 💬 GitHub Issues: [Issues erstellen](https://github.com/maruldk/wegroup-plattform/issues)
-- 📖 Dokumentation: [docs/](docs/)
+- Erstelle ein [Issue](https://github.com/maruldk/wegroup-communication/issues)
+- Kontaktiere das Entwicklungsteam
+- Schaue in die [Dokumentation](https://github.com/maruldk/wegroup-communication/wiki)
 
 ---
 
-**WeGroup Platform** - Modulare KI-gestützte Business-Plattform für die Zukunft des Unternehmensmanagements.
+**WeGroup Communication Platform** - Verbinde dein Team, steigere die Produktivität! 🚀
