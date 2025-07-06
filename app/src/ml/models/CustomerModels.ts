@@ -2,8 +2,8 @@
 import { MLModel, PredictionResult, TrainingData } from './types';
 
 export class CustomerLifetimeValueModel implements MLModel {
-  modelId = 'clv_prediction_v2.5';
-  modelType = 'deep_neural_network';
+  id = 'clv_prediction_v2.5';
+  type = 'regression';
   version = '2.5.0';
   
   private model: any = null;
@@ -38,7 +38,6 @@ export class CustomerLifetimeValueModel implements MLModel {
     return {
       prediction: {
         lifetime_value: clvPrediction.value,
-        confidence: clvPrediction.confidence,
         time_horizon: '24_months',
         value_breakdown: clvPrediction.breakdown,
         customer_segment: segmentation,
@@ -46,8 +45,9 @@ export class CustomerLifetimeValueModel implements MLModel {
         growth_potential: this.calculateGrowthPotential(features),
         recommendations: recommendations
       },
+      confidence: clvPrediction.confidence,
       metadata: {
-        modelId: this.modelId,
+        modelId: this.id,
         version: this.version,
         timestamp: new Date(),
         features_used: Object.keys(features)
@@ -56,7 +56,7 @@ export class CustomerLifetimeValueModel implements MLModel {
   }
 
   async train(data: TrainingData): Promise<void> {
-    console.log(`Training ${this.modelId} with ${data.samples.length} samples`);
+    console.log(`Training ${this.id} with ${data.samples} samples`);
     this.model.lastTrained = new Date();
   }
 
@@ -241,8 +241,8 @@ export class CustomerLifetimeValueModel implements MLModel {
 }
 
 export class ChurnPredictionModel implements MLModel {
-  modelId = 'churn_prediction_v3.1';
-  modelType = 'ensemble_classifier';
+  id = 'churn_prediction_v3.1';
+  type = 'classification';
   version = '3.1.0';
   
   private model: any = null;

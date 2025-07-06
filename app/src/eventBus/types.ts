@@ -11,6 +11,7 @@ export interface Event {
     causationId?: string;
     version: number;
     source: string;
+    [key: string]: any; // Allow additional metadata properties
   };
   timestamp: Date;
   isReplay?: boolean;
@@ -101,6 +102,27 @@ export interface AutomationEvent extends Event {
     status: 'running' | 'completed' | 'failed';
     result?: any;
     error?: string;
+  };
+}
+
+export interface GroupEvent extends Event {
+  type: 'group.created' | 'group.updated' | 'group.deleted' | 'group.archived' | 
+        'group.member.joined' | 'group.member.left' | 'group.member.invited' | 
+        'group.member.removed' | 'group.member.role.changed' | 
+        'group.role.created' | 'group.role.updated' | 'group.role.deleted' |
+        'group.settings.changed' | 'group.visibility.changed';
+  data: {
+    groupId: string;
+    groupName: string;
+    memberId?: string;
+    memberEmail?: string;
+    roleId?: string;
+    roleName?: string;
+    previousRole?: string;
+    newRole?: string;
+    settings?: Record<string, any>;
+    changes?: Record<string, any>;
+    metadata: Record<string, any>;
   };
 }
 

@@ -1,0 +1,351 @@
+
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/wegroup-plattform/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// NextAuth.js Models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// User Management
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          UserRole  @default(USER)
+  tenantId      String?
+  isActive      Boolean   @default(true)
+  
+  // Profile Information
+  firstName     String?
+  lastName      String?
+  bio           String?
+  phone         String?
+  location      String?
+  timezone      String?
+  
+  // Preferences
+  preferences   Json?
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  lastLoginAt   DateTime?
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  groupMembers  GroupMember[]
+  createdGroups Group[]   @relation("GroupCreator")
+  
+  @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  MODERATOR
+}
+
+// Group Management Models
+model Group {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  slug        String      @unique
+  visibility  GroupVisibility @default(PUBLIC)
+  status      GroupStatus @default(ACTIVE)
+  
+  // Group Settings
+  maxMembers  Int?
+  joinPolicy  JoinPolicy  @default(OPEN)
+  tags        String[]
+  category    String?
+  
+  // Media
+  avatar      String?
+  banner      String?
+  
+  // Metadata
+  metadata    Json?
+  
+  // Analytics
+  memberCount Int         @default(0)
+  activityScore Float     @default(0)
+  
+  // Timestamps
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  // Relations
+  creatorId   String
+  creator     User        @relation("GroupCreator", fields: [creatorId], references: [id])
+  members     GroupMember[]
+  roles       GroupRole[]
+  
+  @@map("groups")
+}
+
+enum GroupVisibility {
+  PUBLIC
+  PRIVATE
+  UNLISTED
+}
+
+enum GroupStatus {
+  ACTIVE
+  ARCHIVED
+  SUSPENDED
+}
+
+enum JoinPolicy {
+  OPEN          // Anyone can join
+  REQUEST       // Request required
+  INVITE_ONLY   // Invitation required
+}
+
+model GroupMember {
+  id        String           @id @default(cuid())
+  userId    String
+  groupId   String
+  roleId    String?
+  status    MemberStatus     @default(ACTIVE)
+  
+  // Member specific data
+  nickname  String?
+  bio       String?
+  
+  // Participation tracking
+  joinedAt  DateTime         @default(now())
+  lastActiveAt DateTime?
+  
+  // Permissions override
+  permissions Json?
+  
+  // Relations
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group     Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  role      GroupRole?       @relation(fields: [roleId], references: [id])
+  
+  @@unique([userId, groupId])
+  @@map("group_members")
+}
+
+enum MemberStatus {
+  ACTIVE
+  INACTIVE
+  BANNED
+  LEFT
+}
+
+model GroupRole {
+  id          String        @id @default(cuid())
+  groupId     String
+  name        String
+  description String?
+  color       String?       // Hex color for UI
+  priority    Int           @default(0) // Higher priority = more permissions
+  
+  // Permissions
+  permissions Json
+  
+  // System roles
+  isDefault   Boolean       @default(false)
+  isSystem    Boolean       @default(false) // Admin, Moderator roles
+  
+  // Timestamps
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  
+  // Relations
+  group       Group         @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  members     GroupMember[]
+  
+  @@unique([groupId, name])
+  @@map("group_roles")
+}
+
+// Group Activity & Events
+model GroupActivity {
+  id          String           @id @default(cuid())
+  groupId     String
+  userId      String?
+  type        ActivityType
+  action      String
+  description String?
+  
+  // Event data
+  eventData   Json?
+  
+  // Metadata
+  ipAddress   String?
+  userAgent   String?
+  
+  // Timestamps
+  createdAt   DateTime         @default(now())
+  
+  @@map("group_activities")
+  @@index([groupId, createdAt])
+  @@index([userId, createdAt])
+}
+
+enum ActivityType {
+  GROUP_CREATED
+  GROUP_UPDATED
+  GROUP_DELETED
+  MEMBER_JOINED
+  MEMBER_LEFT
+  MEMBER_INVITED
+  MEMBER_REMOVED
+  MEMBER_ROLE_CHANGED
+  ROLE_CREATED
+  ROLE_UPDATED
+  ROLE_DELETED
+  SETTINGS_CHANGED
+}
+
+// Group Statistics
+model GroupStats {
+  id                String    @id @default(cuid())
+  groupId           String    @unique
+  
+  // Member statistics
+  totalMembers      Int       @default(0)
+  activeMembers     Int       @default(0)
+  newMembersToday   Int       @default(0)
+  newMembersWeek    Int       @default(0)
+  newMembersMonth   Int       @default(0)
+  
+  // Activity statistics
+  totalActivities   Int       @default(0)
+  activitiesToday   Int       @default(0)
+  activitiesWeek    Int       @default(0)
+  activitiesMonth   Int       @default(0)
+  
+  // Engagement metrics
+  engagementScore   Float     @default(0)
+  growthRate        Float     @default(0)
+  churnRate         Float     @default(0)
+  
+  // Timestamps
+  lastUpdated       DateTime  @default(now())
+  
+  @@map("group_stats")
+}
+
+// AI/ML Integration Models
+model GroupRecommendation {
+  id          String                 @id @default(cuid())
+  userId      String
+  groupId     String
+  type        RecommendationType
+  confidence  Float
+  reason      String?
+  
+  // ML Model info
+  modelId     String
+  modelVersion String
+  
+  // Status
+  status      RecommendationStatus   @default(PENDING)
+  viewedAt    DateTime?
+  actionedAt  DateTime?
+  
+  // Timestamps
+  createdAt   DateTime               @default(now())
+  expiresAt   DateTime?
+  
+  @@map("group_recommendations")
+  @@index([userId, status])
+  @@index([groupId, type])
+}
+
+enum RecommendationType {
+  JOIN_GROUP
+  SIMILAR_GROUPS
+  ROLE_SUGGESTION
+  ACTIVITY_SUGGESTION
+}
+
+enum RecommendationStatus {
+  PENDING
+  VIEWED
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+// Event Store for Event Sourcing
+model EventStore {
+  id              String    @id @default(cuid())
+  eventId         String    @unique
+  eventType       String
+  aggregateId     String?
+  aggregateType   String?
+  
+  // Event data
+  eventData       Json
+  metadata        Json?
+  
+  // Versioning
+  version         Int       @default(1)
+  
+  // Context
+  userId          String?
+  tenantId        String?
+  correlationId   String?
+  causationId     String?
+  
+  // Timestamps
+  timestamp       DateTime  @default(now())
+  
+  @@map("event_store")
+  @@index([eventType, timestamp])
+  @@index([aggregateId, aggregateType])
+  @@index([correlationId])
+}

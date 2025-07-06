@@ -103,7 +103,7 @@ export class EventStore {
     let fromVersion = 0;
 
     if (snapshot) {
-      aggregate = Object.assign(new aggregateClass(), snapshot.data);
+      aggregate = Object.assign(new aggregateClass() as any, snapshot.data) as T;
       fromVersion = snapshot.version;
     } else {
       aggregate = new aggregateClass();

@@ -146,8 +146,8 @@ class IntelligentEventRouter {
       const prediction = await this.mlService.predict('event_router', features);
       
       return {
-        targetHandlers: prediction.handlers || ['default'],
-        priority: prediction.priority || 1,
+        targetHandlers: prediction.prediction.handlers || ['default'],
+        priority: prediction.prediction.priority || 1,
         confidence: prediction.confidence || 0.5
       };
     } catch (error) {
